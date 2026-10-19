@@ -4,7 +4,7 @@ import json
 from datetime import datetime
 
 # 💡 這裡目前放的是 Nijisanji 官方頻道的 ID 作為測試，你可以隨時改成你想追蹤的 VTuber 頻道 ID
-CHANNEL_ID = "UC_x5XG1OV2P6uYZ5HEx9fyw" 
+CHANNEL_ID = "UC9HYkiQZ1_b3J_F8gc12eaA" 
 rss_url = f"https://youtube.com{CHANNEL_ID}"
 
 try:
