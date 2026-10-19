@@ -4,26 +4,25 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>塚原大地配信時間表</title>
-  <!-- 修正後的 FullCalendar 核心大腦 CDN -->
-  <script src="https://jsdelivr.net"></script>
+  <!-- 加上 defer，確保套件完全下載完畢才執行，徹底根治 ReferenceError 錯誤 -->
+  <script defer src="https://jsdelivr.net"></script>
   <style>
     body {
       font-family: 'Helvetica Neue', Arial, sans-serif;
       margin: 0;
       padding: 20px;
-      background-color: #e2e8f0; /* 淺灰色背景 */
+      background-color: #e2e8f0;
     }
     #calendar-container {
       max-width: 800px;
       margin: 20px auto;
-      background: rgba(255, 255, 255, 0.85); /* 半透明白紙質感 */
+      background: rgba(255, 255, 255, 0.85);
       backdrop-filter: blur(10px);
       padding: 20px;
       border-radius: 16px;
       box-shadow: 0 10px 25px rgba(0,0,0,0.05);
       border: 1px solid rgba(255, 255, 255, 0.5);
     }
-    /* 客製化 FullCalendar 樣式使其更像日系 UI */
     .fc {
       --fc-border-color: #cbd5e1;
       --fc-button-bg-color: #64748b;
@@ -36,9 +35,8 @@
       font-weight: bold;
       color: #334155;
     }
-    /* 自訂活動卡片外觀 */
     .fc-v-event {
-      background-color: #475569 !important; /* 深藍灰色卡片 */
+      background-color: #475569 !important;
       border: none !important;
       border-radius: 6px !important;
       padding: 4px;
@@ -57,31 +55,36 @@
   </div>
 
   <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    // 使用 window.onload 強制等所有外部套件（包括 FullCalendar）徹底載入完成後才初始化日曆
+    window.onload = function() {
       const calendarEl = document.getElementById('calendar');
-      const calendar = new FullCalendar.Calendar(calendarEl, {
-        initialView: 'timeGridWeek', // 改為一週時間線視圖
-        locale: 'zh-tw',
-        firstDay: 1, // 一週從星期一開始顯示
-        slotMinTime: '06:00:00', // 隱藏深夜到清晨的空白時間
-        slotMaxTime: '24:00:00', 
-        allDaySlot: false, // 隱藏全天全頂部區塊，讓排版更乾淨
-        slotLabelFormat: { hour: '2-digit', minute: '2-digit', hour12: false }, // 24小時制
-        headerToolbar: {
-          left: 'prev,next today',
-          center: 'title',
-          right: 'timeGridWeek,dayGridMonth'
-        },
-        events: './events.json',
-        eventClick: function(info) {
-          if (info.event.url) {
-            window.open(info.event.url, '_blank');
-            info.jsEvent.preventDefault(); 
+      if (typeof FullCalendar !== 'undefined') {
+        const calendar = new FullCalendar.Calendar(calendarEl, {
+          initialView: 'timeGridWeek',
+          locale: 'zh-tw',
+          firstDay: 1,
+          slotMinTime: '06:00:00',
+          slotMaxTime: '24:00:00', 
+          allDaySlot: false,
+          slotLabelFormat: { hour: '2-digit', minute: '2-digit', hour12: false },
+          headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'timeGridWeek,dayGridMonth'
+          },
+          events: './events.json',
+          eventClick: function(info) {
+            if (info.event.url) {
+              window.open(info.event.url, '_blank');
+              info.jsEvent.preventDefault(); 
+            }
           }
-        }
-      });
-      calendar.render();
-    });
+        });
+        calendar.render();
+      } else {
+        console.error('FullCalendar 套件載入失敗，正在嘗試重新讀取...');
+      }
+    };
   </script>
 </body>
 </html>
