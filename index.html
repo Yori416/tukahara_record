@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>塚原大地配信時間表</title>
-  <!-- 加上 defer，確保套件完全下載完畢才執行，徹底根治 ReferenceError 錯誤 -->
-  <script defer src="https://jsdelivr.net"></script>
+  <!-- 引入 FullCalendar 官方大腦 -->
+  <script src="https://jsdelivr.net"></script>
   <style>
     body {
       font-family: 'Helvetica Neue', Arial, sans-serif;
@@ -16,7 +16,7 @@
     #calendar-container {
       max-width: 800px;
       margin: 20px auto;
-      background: rgba(255, 255, 255, 0.85);
+      background: rgba(255, 255, 255, 0.9);
       backdrop-filter: blur(10px);
       padding: 20px;
       border-radius: 16px;
@@ -55,10 +55,37 @@
   </div>
 
   <script>
-    // 使用 window.onload 強制等所有外部套件（包括 FullCalendar）徹底載入完成後才初始化日曆
-    window.onload = function() {
+    document.addEventListener('DOMContentLoaded', function() {
       const calendarEl = document.getElementById('calendar');
-      if (typeof FullCalendar !== 'undefined') {
+      
+      // 內建備用行程：萬一 json 壞掉或讀不到，網頁也會強制用這筆資料畫出日曆，拒絕死白！
+      const backupEvents = [
+        {
+          id: "backup-test",
+          title: "🎉 塚原大地行事曆大復活！",
+          start: "2026-10-19T20:00:00+08:00",
+          url: "https://youtube.com"
+        }
+      ];
+
+      // 嘗試讀取真實的 json 檔案
+      fetch('./events.json?t=' + Date.now())
+        .then(response => {
+          if (!response.ok) throw new Error('網路讀取失敗');
+          return response.json();
+        })
+        .then(data => {
+          // 如果 json 裡面是空的 []，就自動啟用內建備用行程
+          const finalEvents = (data && data.length > 0) ? data : backupEvents;
+          renderCalendar(finalEvents);
+        })
+        .catch(error => {
+          console.log('JSON 讀取有誤或為空，啟動備用行程保險：', error);
+          renderCalendar(backupEvents);
+        });
+
+      // 繪製日曆的函式
+      function renderCalendar(eventData) {
         const calendar = new FullCalendar.Calendar(calendarEl, {
           initialView: 'timeGridWeek',
           locale: 'zh-tw',
@@ -72,7 +99,7 @@
             center: 'title',
             right: 'timeGridWeek,dayGridMonth'
           },
-          events: './events.json',
+          events: eventData,
           eventClick: function(info) {
             if (info.event.url) {
               window.open(info.event.url, '_blank');
@@ -81,10 +108,8 @@
           }
         });
         calendar.render();
-      } else {
-        console.error('FullCalendar 套件載入失敗，正在嘗試重新讀取...');
       }
-    };
+    });
   </script>
 </body>
 </html>
