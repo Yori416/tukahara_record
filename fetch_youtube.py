@@ -3,9 +3,9 @@ import xml.etree.ElementTree as ET
 import json
 from datetime import datetime
 
-# 💡 這裡目前放的是 Nijisanji 官方頻道的 ID 作為測試，你可以隨時改成你想追蹤的 VTuber 頻道 ID
+# 💡 塚原大地的 YouTube 頻道 ID
 CHANNEL_ID = "UC9HYkiQZ1_b3J_F8gc12eaA" 
-rss_url = f"https://youtube.com{CHANNEL_ID}"
+rss_url = f"https://www.youtube.com/@TsukaharaDaichi_Y4T4"
 
 try:
     # 讀取 YouTube RSS Feed
@@ -14,7 +14,7 @@ try:
     root = ET.fromstring(data)
     
     events = []
-    # 解析 XML 取得影片資訊
+    # 解析 XML 取得影片資訊（使用完整正確的 Namespace）
     for entry in root.findall('{http://w3.org}entry'):
         title = entry.find('{http://w3.org}title').text
         video_id = entry.find('{http://youtube.com}videoId').text
